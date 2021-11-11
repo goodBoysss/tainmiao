@@ -1,0 +1,18 @@
+{
+    "name": "tianmiao/excel",
+    "description": "excel",
+    "autoload": {
+        "psr-4": {
+            "Tianmiao\\Excel\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "zhanglx",
+            "email": "zhanglx92@163.com"
+        }
+    ],
+    "require": {
+        "phpoffice/phpexcel": "^1.8"
+    }
+}
