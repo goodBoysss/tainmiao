@@ -68,11 +68,11 @@ class ExcelExport
     public function __construct($template_excel_path = "") {
 
         if (!empty($template_excel_path) && file_exists($template_excel_path)) {
-            $this->objPHPExcel = $this->load($template_excel_path);
+            $this->load($template_excel_path);
         } else {
             $this->objPHPExcel = new \PHPExcel();
+            $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
         }
-        $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
 
         $this->row = 1;
 
@@ -86,17 +86,19 @@ class ExcelExport
     }
 
     /**
-     * 加载文件
-     * @param $excel_path
-     * @return \PHPExcel
+     * 加载模板文件
+     * @param $template_excel_path
+     * @throws \PHPExcel_Exception
      * @throws \PHPExcel_Reader_Exception
      */
-    private function load($excel_path) {
+    public function load($template_excel_path) {
         //单元格不自动调整宽度
         $this->is_auto_column_width = 0;
         //读取excel
         $objReader = new \PHPExcel_Reader_Excel2007();
-        return @$objReader->load($excel_path);
+
+        $this->objPHPExcel = @$objReader->load($template_excel_path);
+        $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
     }
 
     /**
@@ -134,12 +136,13 @@ class ExcelExport
                         $char = chr(64 + $n) . chr(64 + $r);
                     }
 
-                    //前500行提取宽度
-                    if ($this->row < 200) {
-                        //设置自动适应宽度
-                        $this->setColumnWidth($char, $v);
+                    if ($this->is_auto_column_width == 1) {
+                        //前500行提取宽度
+                        if ($this->row < 200) {
+                            //设置自动适应宽度
+                            $this->setColumnWidth($char, $v);
+                        }
                     }
-
 
                     $this->sheet->setCellValue("{$char}{$this->row}", $v);
                     $col++;
