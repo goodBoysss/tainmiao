@@ -39,6 +39,12 @@ class ExcelExport
     private $error = "";
 
     /**
+     * 是否自动调整单元格宽度
+     * @var int
+     */
+    private $is_auto_column_width = 1;
+
+    /**
      * 列最小宽度
      * @var int
      */
@@ -54,12 +60,18 @@ class ExcelExport
 
     /**
      * 列单元格宽度
+     * @var string $template_excel_path 模板excel文件地址
      * @var array
      */
     private $column_width_arr = array();
 
-    public function __construct() {
-        $this->objPHPExcel = new \PHPExcel();
+    public function __construct($template_excel_path = "") {
+
+        if (!empty($template_excel_path) && file_exists($template_excel_path)) {
+            $this->objPHPExcel = $this->load($template_excel_path);
+        } else {
+            $this->objPHPExcel = new \PHPExcel();
+        }
         $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
 
         $this->row = 1;
@@ -71,6 +83,20 @@ class ExcelExport
         $this->max_column_width = 50;
 
         $this->column_width_arr = array();
+    }
+
+    /**
+     * 加载文件
+     * @param $excel_path
+     * @return \PHPExcel
+     * @throws \PHPExcel_Reader_Exception
+     */
+    private function load($excel_path) {
+        //单元格不自动调整宽度
+        $this->is_auto_column_width = 0;
+        //读取excel
+        $objReader = new \PHPExcel_Reader_Excel2007();
+        return @$objReader->load($excel_path);
     }
 
     /**
@@ -174,6 +200,14 @@ class ExcelExport
 
         return $result;
 
+    }
+
+    /**
+     * 设置插入的起始行
+     * @param int $row
+     */
+    public function setInsertRow($row = 1) {
+        $this->row = $row;
     }
 
 
