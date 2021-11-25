@@ -94,11 +94,22 @@ class ExcelExport
     public function load($template_excel_path) {
         //单元格不自动调整宽度
         $this->is_auto_column_width = 0;
-        //读取excel
-        $objReader = new \PHPExcel_Reader_Excel2007();
+
+        $type = $this->getFileType($template_excel_path);
+        if ($type == "xls") {
+            //读取excel
+            $objReader = new \PHPExcel_Reader_Excel5();
+        } elseif ($type == "xlse") {
+            //读取excel
+            $objReader = new \PHPExcel_Reader_Excel2007();
+        } else {
+            //读取excel
+            $objReader = new \PHPExcel_Reader_Excel5();
+        }
 
         $this->objPHPExcel = @$objReader->load($template_excel_path);
         $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
+
     }
 
     /**
@@ -271,6 +282,21 @@ class ExcelExport
                 $this->sheet->getColumnDimension($char)->setWidth($column_width);
             }
         }
+    }
+
+    /**
+     * 获取文件后缀
+     * @param $file_name
+     * @return string
+     */
+    private function getFileType($file_name) {
+        $suffix = "";
+
+        $arr = explode('.', $file_name);
+
+        $suffix = end($arr);
+
+        return $suffix;
     }
 
 
