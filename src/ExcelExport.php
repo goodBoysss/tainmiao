@@ -99,7 +99,7 @@ class ExcelExport
         if ($type == "xls") {
             //读取excel
             $objReader = new \PHPExcel_Reader_Excel5();
-        } elseif ($type == "xlse") {
+        } elseif ($type == "xlsx") {
             //读取excel
             $objReader = new \PHPExcel_Reader_Excel2007();
         } else {
@@ -290,8 +290,6 @@ class ExcelExport
      * @return string
      */
     private function getFileType($file_name) {
-        $suffix = "";
-
         $arr = explode('.', $file_name);
 
         $suffix = end($arr);
