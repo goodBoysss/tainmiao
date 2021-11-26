@@ -26,7 +26,7 @@ class ExcelReader
      */
     private $sheet;
 
-    public function __construct($excel_path = "") {
+    public function __construct($excel_path) {
         $type = $this->getFileType($excel_path);
         if ($type == "xls") {
             //读取excel
@@ -56,7 +56,7 @@ class ExcelReader
      * 获取excel全部数据
      * @return array
      */
-    public function getFullData() {
+    public function getAllData() {
         $data = array();
         try {
             $highest_row = $this->sheet->getHighestRow();
