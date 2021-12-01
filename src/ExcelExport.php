@@ -199,8 +199,15 @@ class ExcelExport
 
             //清除缓冲区,避免乱码
             //ob_end_clean();
+
             //"Excel2007"生成2007版本的xlsx，"Excel5"生成2003版本的xls
-            $objWriter = \PHPExcel_IOFactory::createWriter($this->objPHPExcel, 'Excel2007');
+            $writer_Type = "Excel5";
+            $suffix = $this->getFileType($path);
+            if ($suffix == "xlsx") {
+                $writer_Type = "Excel2007";
+            }
+
+            $objWriter = \PHPExcel_IOFactory::createWriter($this->objPHPExcel, $writer_Type);
             $objWriter->save($path);
 
             //对象重新初始化
