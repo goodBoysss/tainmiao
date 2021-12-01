@@ -183,6 +183,23 @@ class ExcelExport
     }
 
     /**
+     * 水平居中
+     * @param string $cell 例：A1 或 A1:A2
+     * @return bool
+     */
+    public function center($cell){
+        try {
+            $this->objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $result = true;
+        } catch (\Exception $e) {
+            $this->error = $e->getMessage();
+            $result = false;
+        }
+        return $result;
+
+    }
+
+    /**
      * 保存
      * @param $path
      * @return bool
