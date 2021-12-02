@@ -14,15 +14,22 @@
  */
 
 namespace Tianmiao\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xls;
+
 class ExcelExport
 {
 
     /**
-     * @var \PHPExcel
+     * @var Spreadsheet
      */
     private $objPHPExcel;
     /**
-     * @var \PHPExcel_Worksheet
+     * @var Worksheet
      */
     private $sheet;
 
@@ -70,7 +77,7 @@ class ExcelExport
         if (!empty($template_excel_path) && file_exists($template_excel_path)) {
             $this->load($template_excel_path);
         } else {
-            $this->objPHPExcel = new \PHPExcel();
+            $this->objPHPExcel = new Spreadsheet();
             $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
         }
 
@@ -88,28 +95,14 @@ class ExcelExport
     /**
      * 加载模板文件
      * @param $template_excel_path
-     * @throws \PHPExcel_Exception
-     * @throws \PHPExcel_Reader_Exception
+     * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
     public function load($template_excel_path) {
         //单元格不自动调整宽度
         $this->is_auto_column_width = 0;
 
-        $type = $this->getFileType($template_excel_path);
-        if ($type == "xls") {
-            //读取excel
-            $objReader = new \PHPExcel_Reader_Excel5();
-        } elseif ($type == "xlsx") {
-            //读取excel
-            $objReader = new \PHPExcel_Reader_Excel2007();
-        } else {
-            //读取excel
-            $objReader = new \PHPExcel_Reader_Excel5();
-        }
-
-        $this->objPHPExcel = @$objReader->load($template_excel_path);
+        $this->objPHPExcel = IOFactory::load($template_excel_path);
         $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
-
     }
 
     /**
@@ -156,6 +149,8 @@ class ExcelExport
                     }
 
                     $this->sheet->setCellValue("{$char}{$this->row}", $v);
+
+
                     $col++;
                 }
 
@@ -189,7 +184,7 @@ class ExcelExport
      */
     public function center($cell){
         try {
-            $this->objPHPExcel->getActiveSheet()->getStyle($cell)->getAlignment()->setHorizontal(\PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+            $this->sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $result = true;
         } catch (\Exception $e) {
             $this->error = $e->getMessage();
@@ -217,14 +212,15 @@ class ExcelExport
             //清除缓冲区,避免乱码
             //ob_end_clean();
 
-            //"Excel2007"生成2007版本的xlsx，"Excel5"生成2003版本的xls
-            $writer_Type = "Excel5";
             $suffix = $this->getFileType($path);
             if ($suffix == "xlsx") {
-                $writer_Type = "Excel2007";
-            }
 
-            $objWriter = \PHPExcel_IOFactory::createWriter($this->objPHPExcel, $writer_Type);
+            }else{
+
+            }
+            $objWriter = new Xls($this->objPHPExcel);
+
+
             $objWriter->save($path);
 
             //对象重新初始化
