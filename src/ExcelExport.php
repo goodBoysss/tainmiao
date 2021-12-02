@@ -230,6 +230,7 @@ class ExcelExport
             //对象重新初始化
             $this->__construct();
 
+
         } catch (\Exception $e) {
             $result = false;
 
