@@ -63,7 +63,7 @@ class ExcelReader
             $highest_column = $this->sheet->getHighestColumn();
 
 
-            for ($i = 1; $i < $highest_row; $i++) {
+            for ($i = 1; $i <= $highest_row; $i++) {
                 for ($j = 'A'; $j <= $highest_column; $j++) {
                     $value = $this->sheet->getCell("{$j}{$i}")->getValue();
                     $data[$i - 1][] = $value;
