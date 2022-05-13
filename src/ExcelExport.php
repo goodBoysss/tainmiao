@@ -353,6 +353,7 @@ class ExcelExport
         if (!empty($this->rows[$newIndex])) {
             $this->setInsertRow($this->rows[$newIndex]);
         } else {
+            $this->rows[$newIndex] = 1;
             $this->setInsertRow(1);
         }
     }
@@ -371,13 +372,19 @@ class ExcelExport
         //长度预留
         $length = $length + 3;
 
+        //工作区index
+        $sheetIndex = $this->objPHPExcel->getActiveSheetIndex();
+        if (!isset($this->column_width_arr[$sheetIndex])) {
+            $this->column_width_arr[$sheetIndex] = array();
+        }
+
         //自动适应列宽
-        if (!empty($this->column_width_arr[$char])) {
-            if ($this->column_width_arr[$char] < $length) {
-                $this->column_width_arr[$char] = $length;
+        if (!empty($this->column_width_arr[$sheetIndex][$char])) {
+            if ($this->column_width_arr[$sheetIndex][$char] < $length) {
+                $this->column_width_arr[$sheetIndex][$char] = $length;
             }
         } else {
-            $this->column_width_arr[$char] = $length;
+            $this->column_width_arr[$sheetIndex][$char] = $length;
         }
     }
 
@@ -400,13 +407,17 @@ class ExcelExport
     {
         //调整宽度
         if (!empty($this->column_width_arr)) {
-            foreach ($this->column_width_arr as $char => $column_width) {
-                if ($column_width > $this->max_column_width) {
-                    $column_width = $this->max_column_width;
-                } elseif ($column_width < $this->min_column_width) {
-                    $column_width = $this->min_column_width;
+
+            foreach ($this->column_width_arr as $sheelIndex => $columnWidthArr) {
+                $this->switchSheet($sheelIndex);
+                foreach ($columnWidthArr as $char => $column_width) {
+                    if ($column_width > $this->max_column_width) {
+                        $column_width = $this->max_column_width;
+                    } elseif ($column_width < $this->min_column_width) {
+                        $column_width = $this->min_column_width;
+                    }
+                    $this->sheet->getColumnDimension($char)->setWidth($column_width);
                 }
-                $this->sheet->getColumnDimension($char)->setWidth($column_width);
             }
         }
     }
