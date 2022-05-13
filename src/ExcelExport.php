@@ -14,6 +14,7 @@
  */
 
 namespace Tianmiao\Excel;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -38,6 +39,12 @@ class ExcelExport
      * @var int
      */
     private $row = 1;
+
+    /**
+     * 当前插入行（按工作区区分）
+     * @var int
+     */
+    private $rows = array();
 
     /**
      * 错误提示
@@ -72,16 +79,20 @@ class ExcelExport
      */
     private $column_width_arr = array();
 
-    public function __construct($template_excel_path = "") {
-
+    public function __construct($template_excel_path = "")
+    {
+        $sheetIndex = 0;
         if (!empty($template_excel_path) && file_exists($template_excel_path)) {
             $this->load($template_excel_path);
         } else {
             $this->objPHPExcel = new Spreadsheet();
-            $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
+            $this->sheet = $this->objPHPExcel->setActiveSheetIndex($sheetIndex);
         }
 
         $this->row = 1;
+        $this->rows = array(
+            $sheetIndex => $this->row,
+        );
 
         $this->error = "";
 
@@ -97,7 +108,8 @@ class ExcelExport
      * @param $template_excel_path
      * @throws \PhpOffice\PhpSpreadsheet\Exception
      */
-    public function load($template_excel_path) {
+    public function load($template_excel_path)
+    {
         //单元格不自动调整宽度
         $this->is_auto_column_width = 0;
 
@@ -109,7 +121,8 @@ class ExcelExport
      * 写入数据
      * @param array $data
      */
-    public function write(array $data) {
+    public function write(array $data)
+    {
 
         if (!empty($data[0]) && is_array($data[0])) {
             $data_arr = $data;
@@ -165,7 +178,8 @@ class ExcelExport
      * @param string $end_cell 例：G2
      * @return bool
      */
-    public function merge($start_cell, $end_cell) {
+    public function merge($start_cell, $end_cell)
+    {
         try {
             $this->sheet->mergeCells("{$start_cell}:{$end_cell}");
             $result = true;
@@ -182,7 +196,8 @@ class ExcelExport
      * @param string $cell 例：A1 或 A1:A2
      * @return bool
      */
-    public function center($cell){
+    public function center($cell)
+    {
         try {
             $this->sheet->getStyle($cell)->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $result = true;
@@ -203,9 +218,18 @@ class ExcelExport
     public function addSheet($title)
     {
         try {
-            $clonedWorksheet = clone $this->objPHPExcel->getActiveSheet();
+            $oldSheetIndex = $this->objPHPExcel->getActiveSheetIndex();
+            $newSheetIndex = count($this->rows);
+            //切换工作区行数
+            $this->switchRow($oldSheetIndex, $newSheetIndex);
+
+            //新建工作区
+            $clonedWorksheet = new Worksheet();
             $clonedWorksheet->setTitle($title);
+
             $this->sheet = $this->objPHPExcel->addSheet($clonedWorksheet);
+            $this->objPHPExcel->setActiveSheetIndex($newSheetIndex);
+
             $result = true;
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
@@ -216,13 +240,18 @@ class ExcelExport
 
     /**
      * 切换工作区
-     * @param int $index
+     * @param int $newSheetIndex
      * @return bool
      */
-    public function switchSheet($index)
+    public function switchSheet($newSheetIndex)
     {
         try {
-            $this->sheet=$this->objPHPExcel->getSheet($index);
+            $oldSheetIndex = $this->objPHPExcel->getActiveSheetIndex();
+            //切换工作区行数
+            $this->switchRow($oldSheetIndex, $newSheetIndex);
+            //获取工作区
+            $this->objPHPExcel->setActiveSheetIndex($newSheetIndex);
+            $this->sheet = $this->objPHPExcel->getActiveSheet();
             $result = true;
         } catch (\Throwable $e) {
             $this->error = $e->getMessage();
@@ -254,7 +283,8 @@ class ExcelExport
      * @param $path
      * @return bool
      */
-    public function save($path) {
+    public function save($path)
+    {
 
         $result = true;
         try {
@@ -270,12 +300,13 @@ class ExcelExport
             $suffix = $this->getFileType($path);
             if ($suffix == "xlsx") {
 
-            }else{
+            } else {
 
             }
+            //切换到第一个工作区
+            $this->switchSheet(0);
+            //生成文件
             $objWriter = new Xls($this->objPHPExcel);
-
-
             $objWriter->save($path);
 
             //对象重新初始化
@@ -296,7 +327,8 @@ class ExcelExport
      * 设置插入的起始行
      * @param int $row
      */
-    public function setInsertRow($row = 1) {
+    public function setInsertRow($row = 1)
+    {
         $this->row = $row;
     }
 
@@ -305,8 +337,24 @@ class ExcelExport
      * 获取错误消息
      * @return string
      */
-    public function getError() {
+    public function getError()
+    {
         return $this->error;
+    }
+
+    /**
+     * 切换工作区行数
+     * @param $oldIndex
+     * @param $newIndex
+     */
+    public function switchRow($oldIndex, $newIndex)
+    {
+        $this->rows[$oldIndex] = $this->row;
+        if (!empty($this->rows[$newIndex])) {
+            $this->setInsertRow($this->rows[$newIndex]);
+        } else {
+            $this->setInsertRow(1);
+        }
     }
 
     /**
@@ -315,7 +363,8 @@ class ExcelExport
      * @param  $v
      * @return null
      */
-    private function setColumnWidth($char, $v) {
+    private function setColumnWidth($char, $v)
+    {
 
         $length = strlen($v);
 
@@ -336,7 +385,8 @@ class ExcelExport
      * 目录不存在怎创建目录
      * @param $path
      */
-    private function buildDir($path) {
+    private function buildDir($path)
+    {
         $dir = dirname($path);
         if (!is_dir($dir)) {
             mkdir($dir, 0777, true);
@@ -346,7 +396,8 @@ class ExcelExport
     /**
      * 自动适应宽度
      */
-    private function buildColumnWidth() {
+    private function buildColumnWidth()
+    {
         //调整宽度
         if (!empty($this->column_width_arr)) {
             foreach ($this->column_width_arr as $char => $column_width) {
@@ -365,7 +416,8 @@ class ExcelExport
      * @param $file_name
      * @return string
      */
-    private function getFileType($file_name) {
+    private function getFileType($file_name)
+    {
         $arr = explode('.', $file_name);
 
         $suffix = end($arr);

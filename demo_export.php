@@ -10,4 +10,11 @@ $excel->write(array(
     array("合计", 0, 0.00, 0, 0),
 ));
 
+
+$excel->addSheet("你好");
+$excel->write(array(
+    array("1.0%", 0, 0.00, 0, 0),
+    array("合计2", 0, 0.00, 0, 0),
+));
+
 $excel->save(__DIR__ . "/output.xls");
