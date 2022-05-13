@@ -194,6 +194,61 @@ class ExcelExport
 
     }
 
+
+    /**
+     * 新增工作区
+     * @param string $title
+     * @return bool
+     */
+    public function addSheet($title)
+    {
+        try {
+            $clonedWorksheet = clone $this->objPHPExcel->getActiveSheet();
+            $clonedWorksheet->setTitle($title);
+            $this->sheet = $this->objPHPExcel->addSheet($clonedWorksheet);
+            $result = true;
+        } catch (\Throwable $e) {
+            $this->error = $e->getMessage();
+            $result = false;
+        }
+        return $result;
+    }
+
+    /**
+     * 切换工作区
+     * @param int $index
+     * @return bool
+     */
+    public function switchSheet($index)
+    {
+        try {
+            $this->sheet=$this->objPHPExcel->getSheet($index);
+            $result = true;
+        } catch (\Throwable $e) {
+            $this->error = $e->getMessage();
+            $result = false;
+        }
+        return $result;
+    }
+
+    /**
+     * 获取工作区
+     * @return Worksheet
+     */
+    public function getSheet()
+    {
+        return $this->sheet;
+    }
+
+    /**
+     * 获取excel对象
+     * @return Spreadsheet
+     */
+    public function getExcel()
+    {
+        return $this->objPHPExcel;
+    }
+
     /**
      * 保存
      * @param $path
