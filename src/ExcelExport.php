@@ -436,5 +436,16 @@ class ExcelExport
         return $suffix;
     }
 
+    /**
+     * 设置单元格颜色
+     * @param string $cell 例：A1 或 A1:A2
+     * @param string $color 颜色，例如：fc5531
+     * @return bool
+     */
+    public function setColor($cell, $color)
+    {
+        $this->sheet->getStyle("$cell")->getFont()->getColor()->setRGB($color);
+    }
+
 
 }

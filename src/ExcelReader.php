@@ -14,31 +14,24 @@
  */
 
 namespace Tianmiao\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
 class ExcelReader
 {
 
     /**
-     * @var \PHPExcel
+     * @var Spreadsheet
      */
     private $objPHPExcel;
     /**
-     * @var \PHPExcel_Worksheet
+     * @var Worksheet
      */
     private $sheet;
 
     public function __construct($excel_path) {
-        $type = $this->getFileType($excel_path);
-        if ($type == "xls") {
-            //读取excel
-            $objReader = new \PHPExcel_Reader_Excel5();
-        } elseif ($type == "xlsx") {
-            //读取excel
-            $objReader = new \PHPExcel_Reader_Excel2007();
-        } else {
-            //读取excel
-            $objReader = new \PHPExcel_Reader_Excel5();
-        }
-
+        $objReader=IOFactory::createReader('Xls');
         $this->objPHPExcel = @$objReader->load($excel_path);
         $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
 
