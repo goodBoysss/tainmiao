@@ -75,11 +75,12 @@ class ExcelExport
     /**
      * 列单元格宽度
      * @var string $template_excel_path 模板excel文件地址
+     * @var array $option
      * @var array
      */
     private $column_width_arr = array();
 
-    public function __construct($template_excel_path = "")
+    public function __construct($template_excel_path = "", $option = array())
     {
         $sheetIndex = 0;
         if (!empty($template_excel_path) && file_exists($template_excel_path)) {
@@ -283,7 +284,7 @@ class ExcelExport
      * @param $path
      * @return bool
      */
-    public function save($path)
+    public function save($path = "")
     {
 
         $result = true;
@@ -447,5 +448,23 @@ class ExcelExport
         $this->sheet->getStyle("$cell")->getFont()->getColor()->setRGB($color);
     }
 
+    /**
+     * 获取行数
+     *
+     * @return int
+     */
+    public function getRow()
+    {
+        return $this->row;
+    }
 
+    /**
+     * @param $error
+     * @return false
+     */
+    public function setError($error)
+    {
+        $this->error = $error;
+        return false;
+    }
 }
