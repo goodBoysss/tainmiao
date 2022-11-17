@@ -100,7 +100,7 @@ class ExcelZipExport extends ExcelExport
             parent::write($this->head);
         }
 
-        if (!isset($data[0])) {
+        if (isset($data[0]) && !is_array($data[0])) {
             $data = array($data);
         }
 
