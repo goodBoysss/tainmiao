@@ -314,6 +314,10 @@ class ExcelExport
             $objWriter->save($path);
 
             unset($objWriter);
+
+            $this->objPHPExcel->__destruct();
+            $this->sheet->__destruct();
+
             //对象重新初始化
             self::__construct();
 
