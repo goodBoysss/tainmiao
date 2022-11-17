@@ -9,16 +9,22 @@ class ExcelZipExport extends ExcelExport
 {
 
     /**
+     * zip路径
+     *
      * @var mixed
      */
     private $zip_path;
 
     /**
+     * excel表头
+     *
      * @var array
      */
     private $head = [];
 
     /**
+     * 存储多excel文件目录
+     *
      * @var array
      */
     private $excel_path_arr = [];
@@ -45,19 +51,25 @@ class ExcelZipExport extends ExcelExport
     private $file_num = 1;
 
     /**
+     * 初始化
+     *
      * @param $template_excel_path
      * @param $option
      */
     public function __construct($template_excel_path = "", $option = [])
     {
-        if (!empty($option['zip_path'])) {
-            $this->zip_path = $option['zip_path'];
+        if (empty($option['zip_path'])) {
+
+            $this->setError("未传递保存目录");
         }
+
+        $this->zip_path = $option['zip_path'];
 
         parent::__construct($template_excel_path, $option);
     }
 
     /**
+     * 设置zip保存路径
      *
      * @param $zip_path
      */
@@ -121,6 +133,7 @@ class ExcelZipExport extends ExcelExport
      */
     public function setHead(array $head)
     {
+
         $this->head = $head;
     }
 
@@ -138,6 +151,8 @@ class ExcelZipExport extends ExcelExport
     }
 
     /**
+     * 创建zip压缩
+     *
      * @param $fileList
      * @return bool
      * @throws Exception
