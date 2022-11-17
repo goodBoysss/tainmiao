@@ -86,6 +86,9 @@ class ExcelExport
         if (!empty($template_excel_path) && file_exists($template_excel_path)) {
             $this->load($template_excel_path);
         } else {
+            unset($this->objPHPExcel);
+            unset($this->sheet);
+
             $this->objPHPExcel = new Spreadsheet();
             $this->sheet = $this->objPHPExcel->setActiveSheetIndex($sheetIndex);
         }
@@ -310,6 +313,7 @@ class ExcelExport
             $objWriter = new Xls($this->objPHPExcel);
             $objWriter->save($path);
 
+            unset($objWriter);
             //对象重新初始化
             self::__construct();
 

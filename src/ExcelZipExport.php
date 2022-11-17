@@ -99,11 +99,20 @@ class ExcelZipExport extends ExcelExport
             // 初始化写入表头
             parent::write($this->head);
         }
-        //填充数据
-        parent::write($data);
-        //判断是否需要切换下一个文件
-        if ($this->getRow() >= $this->single_max_row) {
-            parent::save($this->getCurrentExcelPath());
+
+        if (!isset($data[0])) {
+            $data = array($data);
+        }
+
+        foreach ($data as $k => $v) {
+            if ($this->getRow() - 1 == $this->single_max_row) {
+                parent::save($this->getCurrentExcelPath());
+                $this->write(array_values($data));
+                break;
+            } elseif ($this->getRow() - 1 < $this->single_max_row) {
+                parent::write($v);
+                unset($data[$k]);
+            }
         }
     }
 

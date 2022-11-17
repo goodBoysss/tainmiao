@@ -1,12 +1,15 @@
 <?php
 
-require "./vendor/autoload.php";
+require "../vendor/autoload.php";
 
-//$excel = new Tianmiao\Excel\ExcelZipExport('', ['zip_path' => 'www/output.zip']);
+$excel = new Tianmiao\Excel\ExcelZipExport('', [
+    'zip_path' => __DIR__ . "/output.zip",
+    'single_max_row' => 3,
+]);
 
-$excel = new Tianmiao\Excel\ExcelZipExport();
+//$excel = new Tianmiao\Excel\ExcelZipExport();
 
-$excel->setZipPath(__DIR__ . "/output.zip");
+//$excel->setZipPath(__DIR__ . "/output.zip");
 
 $excel->setHead((["费率", "笔数", "充值进账", "手续费", "利润"]));
 
@@ -21,11 +24,10 @@ $data = ([
     ["8.0%", 0, 0.00, 0, 0],
     ["9.0%", 0, 0.00, 0, 0],
     ["10.0%", 0, 0.00, 0, 0],
-    ["11.0%", 0, 0.00, 0, 0],
-    ["12.0%", 0, 0.00, 0, 0],
-    ["13.0%", 0, 0.00, 0, 0],
-    ["14.0%", 0, 0.00, 0, 0],
 ]);
-
+//for ($i=1;$i<100000;$i++){
+//
+//}
 $excel->write($data);
+
 $excel->save();
