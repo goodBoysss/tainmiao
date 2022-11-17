@@ -62,9 +62,13 @@ class ExcelZipExport extends ExcelExport
 
         $this->zip_path = $option['zip_path'];
 
-        $this->single_max_row = $option['single_max_row']  ?? 60000;
+        if (!empty($option['single_max_row'])) {
+            $this->single_max_row = $option['single_max_row'];
+        }
 
-        $this->max_num = $option['max_num'] ?? 600000;
+        if (!empty($option['max_num'])) {
+            $this->max_num = $option['max_num'];
+        }
 
         parent::__construct($template_excel_path, $option);
     }
@@ -86,30 +90,20 @@ class ExcelZipExport extends ExcelExport
     /**
      * 写入数据（当单个excel超出限制后，自动切换下一个excel）
      *
-     * @param  array  $data
+     * @param  array $data
      */
     public function write(array $data)
     {
-        // 初始化写入表头
-        parent::write($this->head);
-        $max_num = 0;
-
-        foreach ($data as $v) {
-            $max_num++;
-
-            if ($max_num < $this->max_num) {
-                // 写入数据
-                parent::write($v);
-
-                if ($this->getRow() > $this->single_max_row) {
-                    parent::save($this->getCurrentExcelPath());
-
-                    //为下一个xls文件写入表头
-                    parent::write($this->head);
-                }
-            } else {
-                $this->setError("超出" . $this->max_num);
-            }
+        //判断是否需要写入表头
+        if ($this->getRow() == 1) {
+            // 初始化写入表头
+            parent::write($this->head);
+        }
+        //填充数据
+        parent::write($data);
+        //判断是否需要切换下一个文件
+        if ($this->getRow() >= $this->single_max_row) {
+            parent::save($this->getCurrentExcelPath());
         }
     }
 
@@ -132,7 +126,7 @@ class ExcelZipExport extends ExcelExport
     /**
      * 设置单个excel表头
      *
-     * @param  array  $head
+     * @param  array $head
      */
     public function setHead(array $head)
     {
@@ -142,7 +136,7 @@ class ExcelZipExport extends ExcelExport
     /**
      * 保存并进行压缩
      *
-     * @param  string  $path
+     * @param  string $path
      * @return bool
      * @throws Exception
      */
@@ -191,9 +185,9 @@ class ExcelZipExport extends ExcelExport
     /**
      * 打包指定目录下，指定文件 zip
      *
-     * @param  string  $filePath  打包的文件路径
-     * @param  array  $fileList  需要打包的文件
-     * @param  ZipArchive  $zip  ZipArchive对象
+     * @param  string $filePath 打包的文件路径
+     * @param  array $fileList 需要打包的文件
+     * @param  ZipArchive $zip ZipArchive对象
      * @return false|mixed
      * @throws Exception
      */
@@ -235,7 +229,7 @@ class ExcelZipExport extends ExcelExport
      * 删除文件
      *
      * @param $dir
-     * @param  array  $fileList
+     * @param  array $fileList
      * @throws Exception
      */
     private function delFile($dir, $fileList)
