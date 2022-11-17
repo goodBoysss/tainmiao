@@ -20,7 +20,7 @@ class ExcelZipExport extends ExcelExport
      *
      * @var array
      */
-    private $head = [];
+    private $header = [];
 
     /**
      * 多excel文件目录
@@ -97,7 +97,7 @@ class ExcelZipExport extends ExcelExport
         //判断是否需要写入表头
         if ($this->getRow() == 1) {
             // 初始化写入表头
-            parent::write($this->head);
+            parent::write($this->header);
         }
 
         if (isset($data[0]) && !is_array($data[0])) {
@@ -135,11 +135,11 @@ class ExcelZipExport extends ExcelExport
     /**
      * 设置单个excel表头
      *
-     * @param  array $head
+     * @param  array $header
      */
-    public function setHead(array $head)
+    public function setHeader(array $header)
     {
-        $this->head = $head;
+        $this->header = $header;
     }
 
     /**
