@@ -9,7 +9,7 @@ class ExcelZipExport extends ExcelExport
 {
 
     /**
-     * zip路径
+     * zip目录
      *
      * @var mixed
      */
@@ -23,7 +23,7 @@ class ExcelZipExport extends ExcelExport
     private $head = [];
 
     /**
-     * 存储多excel文件目录
+     * 多excel文件目录
      *
      * @var array
      */
@@ -51,25 +51,26 @@ class ExcelZipExport extends ExcelExport
     private $file_num = 1;
 
     /**
-     * 初始化
-     *
      * @param $template_excel_path
      * @param $option
      */
     public function __construct($template_excel_path = "", $option = [])
     {
         if (empty($option['zip_path'])) {
-
             $this->setError("未传递保存目录");
         }
 
         $this->zip_path = $option['zip_path'];
 
+        $this->single_max_row = $option['single_max_row']  ?? 60000;
+
+        $this->max_num = $option['max_num'] ?? 600000;
+
         parent::__construct($template_excel_path, $option);
     }
 
     /**
-     * 设置zip保存路径
+     * 设置zip目录
      *
      * @param $zip_path
      */
@@ -84,6 +85,7 @@ class ExcelZipExport extends ExcelExport
 
     /**
      * 写入数据（当单个excel超出限制后，自动切换下一个excel）
+     *
      * @param  array  $data
      */
     public function write(array $data)
@@ -129,16 +131,17 @@ class ExcelZipExport extends ExcelExport
 
     /**
      * 设置单个excel表头
+     *
      * @param  array  $head
      */
     public function setHead(array $head)
     {
-
         $this->head = $head;
     }
 
     /**
      * 保存并进行压缩
+     *
      * @param  string  $path
      * @return bool
      * @throws Exception
@@ -188,9 +191,9 @@ class ExcelZipExport extends ExcelExport
     /**
      * 打包指定目录下，指定文件 zip
      *
-     * @param string $filePath  打包的文件路径
-     * @param array $fileList  需要打包的文件
-     * @param ZipArchive $zip  ZipArchive对象
+     * @param  string  $filePath  打包的文件路径
+     * @param  array  $fileList  需要打包的文件
+     * @param  ZipArchive  $zip  ZipArchive对象
      * @return false|mixed
      * @throws Exception
      */

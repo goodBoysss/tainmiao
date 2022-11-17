@@ -311,7 +311,7 @@ class ExcelExport
             $objWriter->save($path);
 
             //对象重新初始化
-            $this->__construct();
+            self::__construct();
 
 
         } catch (\Exception $e) {
