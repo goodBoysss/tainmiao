@@ -307,6 +307,10 @@ class ExcelExport
             } else {
 
             }
+
+            //单元格默认居中
+            $this->center("A:AC");
+
             //切换到第一个工作区
             $this->switchSheet(0);
             //生成文件
