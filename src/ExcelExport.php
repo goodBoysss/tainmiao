@@ -15,7 +15,6 @@
 
 namespace Tianmiao\Excel;
 
-use mysql_xdevapi\Exception;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Reader\Xlsx;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -331,7 +330,7 @@ class ExcelExport
             $result = false;
             $this->error = $e->getMessage();
             //执行失败抛错
-            throw new Exception($this->error, '500');
+            throw new \Exception($this->error, '500');
         }
 
         return $result;
