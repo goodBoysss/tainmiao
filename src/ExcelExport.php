@@ -165,6 +165,15 @@ class ExcelExport
                         }
                     }
 
+                    //特殊字符串处理
+                    if (is_string($v) && !empty($v)){
+                        //emoji表情过滤
+                        $v = $this->filterEmoji($v);
+
+                        //转义特殊字符
+                        $v = $this->escape($v);
+                    }
+
                     $this->sheet->setCellValue("{$char}{$this->row}", $v);
 
 
@@ -175,6 +184,36 @@ class ExcelExport
             }
         }
     }
+
+
+    /**
+     * 处理Emoji表情
+     * @param $str
+     * @return array|string|string[]|null
+     */
+    private function filterEmoji($str)
+    {
+        return preg_replace_callback(
+            '/./u',
+            function (array $match) {
+                return strlen($match[0]) >= 4 ? '' : $match[0];
+            },
+            $str);
+    }
+
+    /**
+     * 处理第一个字符是否有=符号，进行转义
+     * @param $str
+     * @return mixed|string
+     */
+    private function escape($str)
+    {
+        if (substr($str, 0, 1) == '=') {
+            $str = "'" . $str;
+        }
+        return $str;
+    }
+
 
     /**
      * 合并单元格
