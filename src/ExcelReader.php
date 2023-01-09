@@ -14,6 +14,7 @@
  */
 
 namespace Tianmiao\Excel;
+
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
@@ -30,8 +31,15 @@ class ExcelReader
      */
     private $sheet;
 
-    public function __construct($excel_path) {
-        $objReader=IOFactory::createReader('Xls');
+    public function __construct($excel_path)
+    {
+        $inputFileType = IOFactory::identify($excel_path);
+
+        if (empty($inputFileType) || !in_array($inputFileType, array('Xlsx', 'Xls'))) {
+            throw new \Exception("文件类型不合法");
+        }
+
+        $objReader = IOFactory::createReader($inputFileType);
         $this->objPHPExcel = @$objReader->load($excel_path);
         $this->sheet = $this->objPHPExcel->setActiveSheetIndex(0);
 
@@ -41,7 +49,8 @@ class ExcelReader
      * 获取行数
      * @return int
      */
-    public function getRowCount() {
+    public function getRowCount()
+    {
         return $this->sheet->getHighestRow();
     }
 
@@ -49,7 +58,8 @@ class ExcelReader
      * 获取excel全部数据
      * @return array
      */
-    public function getAllData() {
+    public function getAllData()
+    {
         $data = array();
         try {
             $highest_row = $this->sheet->getHighestRow();
@@ -75,7 +85,8 @@ class ExcelReader
      * @param $file_name
      * @return string
      */
-    private function getFileType($file_name) {
+    private function getFileType($file_name)
+    {
 
         $arr = explode('.', $file_name);
 
